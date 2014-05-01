@@ -2,7 +2,7 @@ CXXFLAGS =	 -g -Wall -fmessage-length=0
 
 OBJS =		wiener2.o
 
-LIBS =	-lboost_program_options `pkg-config --cflags --libs opencv`
+LIBS =	`pkg-config --cflags --libs opencv`
 
 TARGET =	wiener2
 

@@ -1,4 +1,4 @@
-#include <boost/program_options.hpp>
+//#include <boost/program_options.hpp>
 #include <iostream>
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -6,8 +6,11 @@
 
 using namespace cv;
 using namespace std;
-namespace po = boost::program_options;
+//namespace po = boost::program_options;
 
+// Inherited from parsing options
+#define GENERATE_NOISY 0
+#define SHOW 0
 
 Mat wiener2(Mat I, Mat image_spectrum, int noise_stddev);
 Mat padd_image(Mat I);
@@ -19,33 +22,40 @@ Mat with_noise(Mat image, int stddev);
 Mat rand_noise(Mat I, int stddev);
 
 
-
 int main(int argc, char *argv[]) {
 
 	int noise_stddev;
-	string input_filename, output_filename;
+	// Accept output_filename below if require
+	string input_filename, output_filename = "output.bmp";
 
-	po::options_description desc("Allowed options");
-	desc.add_options()
-	    		("help", "produce help message")
-	    		("noise-stddev, n", po::value<int>(&noise_stddev)->default_value(50), "set white noise standard deviation")
-	    		("input, f", po::value<string>(&input_filename))
-	    		("output, o", po::value<string>(&output_filename)->default_value(string("output.bmp")),"output file")
-	    		("generate-noisy", "generate noisy image")
-	    		("show", "shows effects of filtering")
-	    		;
+	// po::options_description desc("Allowed options");
+	// desc.add_options()
+	//     		("help", "produce help message")
+	//     		("noise-stddev, n", po::value<int>(&noise_stddev)->default_value(50), "set white noise standard deviation")
+	//     		("input, f", po::value<string>(&input_filename))
+	//     		("output, o", po::value<string>(&output_filename)->default_value(string("output.bmp")),"output file")
+	//     		("generate-noisy", "generate noisy image")
+	//     		("show", "shows effects of filtering")
+	//     		;
 
-	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-	po::notify(vm);
+	// po::variables_map vm;
+	// po::store(po::parse_command_line(argc, argv, desc), vm);
+	// po::notify(vm);
+
+
+	cout << "Enter input filename =>" << endl;
+	cin >> input_filename; 
+	cout << "Enter noise standard deviation => " << endl;
+	cin >> noise_stddev;
 
 	cout << "noise standard deviation: " << noise_stddev << "\n";
 	cout << "input file: " << input_filename << "\n";
+	cout << "output file: " << output_filename << "\n";
 
-	if (vm.count("help")) {
-		cout << desc << "\n";
-		return 1;
-	}
+	// if (vm.count("help")) {
+	// 	cout << desc << "\n";
+	// 	return 1;
+	// }
 
 	Mat I = imread(input_filename, CV_LOAD_IMAGE_GRAYSCALE);
 	if(I.data==NULL){
@@ -61,7 +71,8 @@ int main(int argc, char *argv[]) {
 
 	Mat padded = padd_image(I);
 	Mat noisy;
-	if(vm.count("generate-noisy")){
+	// Change above preprocessing option if required
+	if(GENERATE_NOISY){
 		noisy = with_noise(padded, noise_stddev);
 		imwrite(output_filename, noisy);
 		return 0;
@@ -76,7 +87,9 @@ int main(int argc, char *argv[]) {
 
 	imwrite(output_filename, enhanced);
 
-	if(vm.count("show")){
+	// Change above preprocessing option SHOW to 1
+	// if you want to see intermediate results
+	if(SHOW){
 		imshow("image 1", noisy);
 		imshow("image 2", enhanced);
 	}
